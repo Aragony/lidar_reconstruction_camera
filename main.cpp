@@ -4,18 +4,19 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 
-#include <pcl/point_types.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/visualization/pcl_visualizer.h>
+
 
 #include "find_feature_matches.h"
 #include "pose_estimation_2d2d .h"
 #include "triangulation.h"
+#include "pcl_cloud.h"
 
 using namespace std;
 using namespace cv;
 
 int main() {
+  //相机内参
+  Mat K = ( Mat_<double> ( 3,3 ) << 9.842439e+02, 0, 6.900000e+02, 0, 9.808141e+02, 2.331966e+02, 0, 0, 1 );
   //读取图像
   Mat img_1 = imread("0000000000.png", CV_LOAD_IMAGE_COLOR);
   Mat img_2 = imread("0000000001.png", CV_LOAD_IMAGE_COLOR);
@@ -37,7 +38,7 @@ int main() {
       A.at<float>(0, 0) = i;
       A.at<float>(1, 0) = j;
       A.at<float>(2, 0) = 1;
-      B = R*A + t;
+      B = K*R*K.inv()*A + K*t;
       B = B/B.at<float>(2, 0);
       if (B.at<float>(0, 0) > 0 && B.at<float>(0, 0) < 375 && B.at<float>(1, 0) > 0 && B.at<float>(1, 0) < 1247) {
         Point3d pl(A.at<float>(0, 0),
@@ -55,26 +56,9 @@ int main() {
   //三角化
   //-- 三角化
   vector<Point3d> points;
-  triangulation(lp, rp,  R, t, points);//稠密版
-  //triangulation( keypoints_1, keypoints_2, matches, R, t, points );//稀疏版
+  //triangulation(lp, rp,  R, t, points);//稠密版
+  triangulation( keypoints_1, keypoints_2, matches, R, t, points );//稀疏版
 
-  typedef pcl::PointXYZRGB PointT;
-  typedef pcl::PointCloud<PointT> PointCloud;
-
-  PointCloud::Ptr pointcloud(new PointCloud);
-
-  for (auto &i:points) {
-    PointT p;
-    p.x = i.x;
-    p.y = i.y;
-    p.z = i.z;
-    p.b = 0;
-    p.g = 0;
-    p.r = 255;
-    pointcloud->points.push_back(p);
-  }
-
-  pointcloud->is_dense = true;
-  pcl::io::savePCDFileBinary("pointcloud.pcd", *pointcloud);
+  pcl_cloud(points);
 
 }
