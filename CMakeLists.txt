@@ -24,5 +24,5 @@ set( THIRD_PARTY_LIBS
         ${PCL_LIBRARIES}
         )
 
-add_executable(lidar_reconstruction_camera main.cpp find_feature_matches.cpp find_feature_matches.h "pose_estimation_2d2d .cpp" "pose_estimation_2d2d .h" triangulation.cpp triangulation.h pixel2cam.cpp pixel2cam.h pcl_cloud.cpp pcl_cloud.h)
+add_executable(lidar_reconstruction_camera main.cpp find_feature_matches.cpp find_feature_matches.h "pose_estimation_2d2d .cpp" "pose_estimation_2d2d .h" triangulation.cpp triangulation.h pixel2cam.cpp pixel2cam.h pcl_cloud.cpp pcl_cloud.h epipolarSearch.cpp epipolarSearch.h NCC.cpp NCC.h)
 target_link_libraries( lidar_reconstruction_camera ${THIRD_PARTY_LIBS} )
