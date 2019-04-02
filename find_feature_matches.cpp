@@ -56,8 +56,8 @@ void find_feature_matches ( const Mat& img_1, const Mat& img_2,
   }
 
   //-- 第五步:绘制匹配结果
-  Mat img_match;
-  drawMatches ( img_1, keypoints_1, img_2, keypoints_2, matches, img_match );
-  imshow ( "所有匹配点对", img_match );
-  waitKey(0);
+  //Mat img_match;
+  //drawMatches ( img_1, keypoints_1, img_2, keypoints_2, matches, img_match );
+  //imshow ( "所有匹配点对", img_match );
+  //waitKey(0);
 }

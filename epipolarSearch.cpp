@@ -2,14 +2,16 @@
 // Created by gintoki on 19-3-28.
 //
 
+#include <iostream>
 #include "epipolarSearch.h"
 const int boarder = 20; 	// 边缘宽度
 const int width = 1242;  	// 宽度
 const int height = 375;  	// 高度
-const double fx = 9.842439e+02;	// 相机内参
-const double fy = 9.808141e+02;
-const double cx = 6.900000e+02;
-const double cy = 2.331966e+02;
+const double fx = 9.597910e+02;	// 相机内参
+const double fy = 9.569251e+02;
+const double cx = 6.960217e+02;
+const double cy = 2.241806e+02;
+
 
 // 像素到相机坐标系
 inline Vector3d px2cam ( const Vector2d px ) {
@@ -36,19 +38,27 @@ inline bool inside( const Vector2d& pt ) {
 
 bool epipolarSearch(
     const Mat& ref, const Mat& curr,
-    const SE3& T_C_R, const Vector2d& pt_ref,
+    const Mat& R,
+    const Mat& t,const Vector2d& pt_ref,
     const double& depth_mu, const double& depth_cov,
     Vector2d& pt_curr )
 {
+  Eigen::Vector3d t2(t.at<double>(0, 0), t.at<double>(1, 0), t.at<double>(2, 0));
+  Eigen::Matrix3d R2;
+  R2 << R.at<double>(0, 0), R.at<double>(0, 1), R.at<double>(0, 2),
+      R.at<double>(1, 0), R.at<double>(1, 1), R.at<double>(1, 2),
+      R.at<double>(2, 0), R.at<double>(2, 1), R.at<double>(2, 2);
+  //std::cout<<R2<<std::endl<<t2<<std::endl;
+
   Vector3d f_ref = px2cam( pt_ref );
   f_ref.normalize();
   Vector3d P_ref = f_ref*depth_mu;	// 参考帧的 P 向量
 
-  Vector2d px_mean_curr = cam2px( T_C_R*P_ref ); // 按深度均值投影的像素
+  Vector2d px_mean_curr = cam2px( R2*P_ref+t2 ); // 按深度均值投影的像素
   double d_min = depth_mu-3*depth_cov, d_max = depth_mu+3*depth_cov;
   if ( d_min<0.1 ) d_min = 0.1;
-  Vector2d px_min_curr = cam2px( T_C_R*(f_ref*d_min) );	// 按最小深度投影的像素
-  Vector2d px_max_curr = cam2px( T_C_R*(f_ref*d_max) );	// 按最大深度投影的像素
+  Vector2d px_min_curr = cam2px( R2*(f_ref*d_min)+t2 );	// 按最小深度投影的像素
+  Vector2d px_max_curr = cam2px( R2*(f_ref*d_max)+t2 );	// 按最大深度投影的像素
 
   Vector2d epipolar_line = px_max_curr - px_min_curr;	// 极线（线段形式）
   Vector2d epipolar_direction = epipolar_line;		// 极线方向

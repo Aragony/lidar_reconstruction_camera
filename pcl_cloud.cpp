@@ -18,6 +18,7 @@ void pcl_cloud(vector<Point3d>& points){
     p.g = 0;
     p.r = 255;
     pointcloud->points.push_back(p);
+
   }
 
   pointcloud->is_dense = true;

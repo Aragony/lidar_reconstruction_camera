@@ -22,7 +22,9 @@ using namespace cv;
 #define LIDAR_RECONSTRUCTION_CAMERA_EPIPOLARSEARCH_H
 bool epipolarSearch(
     const Mat& ref, const Mat& curr,
-    const SE3& T_C_R, const Vector2d& pt_ref,
+    const Mat& T_C_R,
+    const Mat& t,
+    const Vector2d& pt_ref,
     const double& depth_mu, const double& depth_cov,
     Vector2d& pt_curr );
 #endif //LIDAR_RECONSTRUCTION_CAMERA_EPIPOLARSEARCH_H
