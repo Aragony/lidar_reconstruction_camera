@@ -7,7 +7,7 @@
 using namespace std;
 #ifndef LIDAR_RECONSTRUCTION_CAMERA_READ_LIDAR_DATA_H
 #define LIDAR_RECONSTRUCTION_CAMERA_READ_LIDAR_DATA_H
-typedef pcl::PointXYZRGB PointT;
+typedef pcl::PointXYZ PointT;
 typedef pcl::PointCloud<PointT> PointCloud;
 
 PointCloud::Ptr read_lidar_data(const char* file_name);

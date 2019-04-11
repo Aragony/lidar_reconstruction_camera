@@ -4,6 +4,13 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+#include <pcl/registration/icp.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <boost/thread/thread.hpp>
+//#include <pcl/console/parse.h>
+
 #include "find_feature_matches.h"
 #include "pose_estimation_2d2d .h"
 #include "triangulation.h"
@@ -100,7 +107,7 @@ int main() {
 
   ///以下为激光点云处理
   //读取数据
-  typedef pcl::PointXYZRGB PointT;
+  typedef pcl::PointXYZ PointT;
   typedef pcl::PointCloud<PointT> PointCloud;
   PointCloud::Ptr pointcloud0(new PointCloud);
   PointCloud::Ptr pointcloud1(new PointCloud);
@@ -109,6 +116,16 @@ int main() {
   pointcloud1=read_lidar_data("0000000001.bin");
   //pointcloud0->is_dense = true;
   //pcl::io::savePCDFileBinary("pointcloud0.pcd", *pointcloud0);
+  //pointcloud1->is_dense = true;
+  //pcl::io::savePCDFileBinary("pointcloud1.pcd", *pointcloud1);
 
+  pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
+  icp.setInputSource(pointcloud0);
+  icp.setInputTarget(pointcloud1);
+  icp.setMaxCorrespondenceDistance(100);
+  icp.setTransformationEpsilon(1e-10);
+  icp.setEuclideanFitnessEpsilon(0.001);
+  icp.setMaximumIterations(100);
+  icp.align(*pointcloud0);
 
 }
